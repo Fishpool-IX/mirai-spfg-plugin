@@ -5,7 +5,6 @@ import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
-import net.mamoe.mirai.contact.asFriend
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.subscribeAlways
 import net.mamoe.mirai.message.GroupMessageEvent
@@ -23,11 +22,7 @@ object Spfg : KotlinPlugin(
 
         SpfgConfig.reload()
 
-        IAmCmd.register()
-        IAmNotCmd.register()
-        TheyIsCmd.register()
-        TheyIsNotCmd.register()
-        WhoAmICmd.register()
+        SpfgCmd.register()
 
         subscribeAlways<GroupMessageEvent> {
             val callee = SPFG.find(message.contentToString())?.groupValues?.get(1) ?: return@subscribeAlways

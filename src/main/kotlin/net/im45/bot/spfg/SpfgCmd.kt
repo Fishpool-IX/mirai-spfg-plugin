@@ -1,27 +1,25 @@
 package net.im45.bot.spfg
 
 import net.mamoe.mirai.console.command.CommandSender
-import net.mamoe.mirai.console.command.SimpleCommand
+import net.mamoe.mirai.console.command.CompositeCommand
+import net.mamoe.mirai.console.command.getGroupOrNull
 import net.mamoe.mirai.contact.User
+import net.mamoe.mirai.contact.nameCardOrNick
+import java.lang.Appendable
 
-object IAmCmd : SimpleCommand(
-    Spfg, "iam",
-    description = "I am ..."
+object SpfgCmd : CompositeCommand(
+    Spfg, "SPFG",
+    description = "Salted Powerless Fish Group"
 ) {
-    @Handler
+    @SubCommand
     suspend fun CommandSender.iam(name: String) {
         SpfgConfig.self.run {
             add(name)
             sendMessage("Alright, now I am " + joinToString(", "))
         }
     }
-}
 
-object IAmNotCmd : SimpleCommand(
-    Spfg, "iamnot",
-    description = "I am not ..."
-) {
-    @Handler
+    @SubCommand
     suspend fun CommandSender.iamnot(name: String) {
         SpfgConfig.self.run {
             if (remove(name)) {
@@ -31,38 +29,21 @@ object IAmNotCmd : SimpleCommand(
             }
         }
     }
-}
 
-object TheyIsCmd : SimpleCommand(
-    Spfg, "theyis",
-    description = "They is ..."
-) {
-    @Handler
+    @SubCommand
     suspend fun CommandSender.theyis(target: User, alias: String) {
         SpfgConfig.alias[target.id] = alias
         sendMessage("Alright, they is $alias now")
     }
-}
 
-object TheyIsNotCmd : SimpleCommand(
-    Spfg, "theyisnot",
-    description = "They is not ..."
-) {
-    @Handler
+    @SubCommand
     suspend fun CommandSender.theyisnot(target: User) {
-        SpfgConfig.alias.remove(target.id)?.run {
-            sendMessage("Alright, they is no longer $this")
-        }?:run {
-            sendMessage("But they has no name!")
-        }
+        SpfgConfig.alias.remove(target.id)?.let {
+            sendMessage("Alright, they is no longer $it")
+        } ?: sendMessage("But they has no name!")
     }
-}
 
-object WhoAmICmd : SimpleCommand(
-    Spfg, "whoami",
-    description = "Who am I?"
-) {
-    @Handler
+    @SubCommand
     suspend fun CommandSender.whoami() {
         SpfgConfig.self.run {
             if (isEmpty())
