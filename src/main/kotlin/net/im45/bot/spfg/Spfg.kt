@@ -11,12 +11,13 @@ import net.mamoe.mirai.message.GroupMessageEvent
 
 @AutoService(JvmPlugin::class)
 object Spfg : KotlinPlugin(
-    JvmPluginDescription(
-        "net.im45.bot.spfg",
-        "0.1.0"
-    )
+        JvmPluginDescription(
+                "net.im45.bot.spfg",
+                "1.0.0"
+        )
 ) {
     private val SPFG = Regex("(.+?)[!﹗！]+")
+
     override fun onEnable() {
         super.onEnable()
 
@@ -25,8 +26,8 @@ object Spfg : KotlinPlugin(
         SpfgCmd.register()
 
         subscribeAlways<GroupMessageEvent> {
-            val callee = SPFG.find(message.contentToString())?.groupValues?.get(1) ?: return@subscribeAlways
-            if (callee in SpfgConfig.self) sender.run {
+            val match = SPFG.find(message.contentToString()) ?: return@subscribeAlways
+            if (match.groupValues[1] in SpfgConfig.self) sender.run {
                 reply(SpfgConfig.alias.getOrDefault(id, nameCardOrNick) + '!')
             }
         }
