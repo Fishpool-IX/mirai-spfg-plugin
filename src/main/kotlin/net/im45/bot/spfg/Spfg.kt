@@ -1,24 +1,25 @@
 package net.im45.bot.spfg
 
-import com.google.auto.service.AutoService
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.permission.PermissionService
-import net.mamoe.mirai.console.plugin.jvm.JvmPlugin
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription
 import net.mamoe.mirai.console.plugin.jvm.KotlinPlugin
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.event.subscribeAlways
-import net.mamoe.mirai.message.GroupMessageEvent
+import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.events.GroupMessageEvent
 
-@AutoService(JvmPlugin::class)
 object Spfg : KotlinPlugin(
     JvmPluginDescription(
         "net.im45.bot.spfg",
-        "1.0.0",
+        "1.1.0",
         "SPFG"
     )
 ) {
     private val SPFG = Regex("(.+?)[!﹗！]+")
+
+    internal val spfgAdmin by lazy {
+        PermissionService.INSTANCE.register(permissionId("spfgAdmin"), "SPFG Admin")
+    }
 
     override fun onEnable() {
         super.onEnable()
@@ -27,13 +28,10 @@ object Spfg : KotlinPlugin(
 
         SpfgCmd.register()
 
-        PermissionService.INSTANCE.register(spfgAdmin, "SPFG Admin")
-
-        subscribeAlways<GroupMessageEvent> {
+        GlobalEventChannel.subscribeAlways<GroupMessageEvent> {
             val match = SPFG.find(message.contentToString()) ?: return@subscribeAlways
-            if (match.groupValues[1] in SpfgConfig.self) sender.run {
-                reply(SpfgConfig.alias.getOrDefault(id, nameCardOrNick) + '!')
-            }
+            if (match.groupValues[1] in SpfgConfig.self)
+                subject.sendMessage(SpfgConfig.alias.getOrDefault(sender.id, sender.nameCardOrNick) + '!')
         }
     }
 }
